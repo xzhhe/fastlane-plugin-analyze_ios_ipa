@@ -1,6 +1,16 @@
 require 'fastlane/plugin/analyze_ios_ipa/version'
 
 module Fastlane
+  module Helper
+    require 'pp'
+    require 'json'
+    require 'zip'
+    require 'fileutils'
+    require 'singleton'
+  end
+end
+
+module Fastlane
   module AnalyzeIosIpa
     # Return all .rb files inside the "actions" and "helper" directory
     def self.all_classes

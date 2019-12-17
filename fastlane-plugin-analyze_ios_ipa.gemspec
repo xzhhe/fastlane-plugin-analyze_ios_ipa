@@ -10,9 +10,9 @@ Gem::Specification.new do |spec|
   spec.author        = 'xiongzenghui'
   spec.email         = 'zxcvb1234001@163.com'
 
-  spec.summary       = 'xx'
-  # spec.homepage      = "https://github.com/<GITHUB_USERNAME>/fastlane-plugin-analyze_ios_ipa"
-  spec.license       = "MIT"
+  spec.summary       = 'analysis iOS app/ipa multiple data. eg: 1) ipa basic info 2) Size occupied by each component = code + resource'
+  spec.homepage      = 'https://github.com/xzhhe/fastlane-plugin-analyze_ios_ipa'
+  spec.license       = 'MIT'
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   # since this would cause a circular dependency
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
+  spec.add_dependency 'CFPropertyList', '>= 3.0.2', '< 4.0'
 
   spec.add_development_dependency('pry')
   spec.add_development_dependency('bundler')

@@ -1,3 +1,6 @@
-lane :test do
-  analyze_ios_ipa
+lane :hello do
+  UI.success "✅ hello"
+  analyze_ios_ipa(
+    ipa_path: '/Users/xiongzenghui/Downloads/app.ipa'
+  )
 end
