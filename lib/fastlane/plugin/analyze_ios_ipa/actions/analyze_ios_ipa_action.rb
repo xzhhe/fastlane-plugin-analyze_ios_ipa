@@ -5,16 +5,26 @@ require_relative '../helper/app'
 
 module Fastlane
   module Actions
+    module SharedValues
+      AnalyzeIosIpaActionResultHash = :AnalyzeIosIpaActionResultHash
+      AnalyzeIosIpaActionResultJSON = :AnalyzeIosIpaActionResultJSON
+    end
+
+  #  Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GITLAB_AUTO_MERGE_WEB_URL]
+
     class AnalyzeIosIpaAction < Action
       def self.run(params)
         ipa_path = params[:ipa_path]
         app_name = params[:app_name]
         app_path = params[:app_path]
+        group    = params[:group] || true
 
         valid_params(ipa_path, app_path)
-        analyze_ipa if ipa_path
-        analyze_app if app_path
-        generate_json
+        analyze_ipa(group) if ipa_path
+        analyze_app(group) if app_path
+
+        Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultHash] = generate_hash
+        Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultJSON] = generate_json
       end
 
       def self.valid_params(ipa_path, app_path)
@@ -32,7 +42,7 @@ module Fastlane
         Fastlane::Helper::Config.instance.app_path = app_path
       end
 
-      def self.analyze_ipa
+      def self.analyze_ipa(group)
         ipa_path = Fastlane::Helper::Config.instance.ipa_path
         UI.important "❗️[analyze_ipa] ipa_path: #{ipa_path}"
 
@@ -64,10 +74,10 @@ module Fastlane
         Fastlane::Helper::Config.instance.app_path = app_path
 
         # 解析 xx.app
-        analyze_app
+        analyze_app(group)
       end
 
-      def self.analyze_app
+      def self.analyze_app(group)
         app_path   = Fastlane::Helper::Config.instance.app_path
         UI.important "❗️[analyze_app] app_path: #{app_path}"
 
@@ -76,7 +86,7 @@ module Fastlane
         return false unless File.exist?(app_path)
 
         # 解析 xx.app
-        app = Fastlane::Helper::App.new(app_path)
+        app = Fastlane::Helper::App.new(app_path, group: group)
         Fastlane::Helper::Config.instance.app = app
       end
 
@@ -128,6 +138,13 @@ module Fastlane
             description: 'app file path',
             type: String,
             optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :group,
+            description: 'is group files in xx.app ?',
+            optional: true,
+            default_value: true,
+            is_string: false
           )
         ]
       end

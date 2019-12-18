@@ -11,6 +11,12 @@ module Fastlane
     class FileCategory
       attr_accessor :name, :file_infos, :size, :formar_size
 
+      PLUGINS       = 'PlugIns'
+      FRAMEWORKS    = 'Frameworks'
+      UNKNOWN       = 'Unknown'
+      UNKNOWN_FILES = 'UnknownFiles'
+      EXECUTABLE    = 'executable'
+
       def to_hash
         {
           name:        @name,
@@ -20,29 +26,35 @@ module Fastlane
         }
       end
 
+      #
+      # @param type:  文件类型: FileInfo::FileInfoUnknownDir, FileInfo::FileInfoUnknownFile, FileInfo::FileInfoUnknown
+      # @param infos: 文件数组: [#<FileInfo:0x01>, #<FileInfo:0x02>, ... #<FileInfo:0x0N>]
+      #
       def self.categories(type, infos, options = {})
-        executable = options[:executable]
+        executable_name = options[:executable]
 
         block = {
           FileInfoUnknownDir: lambda do |infos|
-            # - 1) PlugIns
-            # - 2) Frameworks
+            # 主要是将如下两个目录, 继续递归遍历解析
+            # - 1) PlugIns 类型
+            # - 2) Frameworks 类型
+            # - 3) Unknown 类型
 
             infos.map { |e|
               fc = FileCategory.new
-              if e.name == 'PlugIns'
-                fc.name = 'PlugIns'
+              if e.name == PLUGINS
+                fc.name = PLUGINS
                 fc.merge(FileHelper.glob_files('*', e.path).map { |f|
                   FileInfo.new(f)
                 })
-              elsif e.name == 'Frameworks'
+              elsif e.name == FRAMEWORKS
                 fc = FileCategory.new
-                fc.name = 'Frameworks'
+                fc.name = FRAMEWORKS
                 fc.merge(FileHelper.glob_files('*', e.path).map { |f|
                   FileInfo.new(f)
                 })
               else
-                fc.name = 'Unknown'
+                fc.name = UNKNOWN
                 fc.push(e)
               end
               fc.finish
@@ -54,11 +66,11 @@ module Fastlane
 
             infos.map { |e|
               fc = FileCategory.new
-              if e.name == executable
-                fc.name = 'executable'
+              if e.name == executable_name
+                fc.name = EXECUTABLE
                 fc.push(FileInfo.new(e.path))
               else
-                fc.name = 'Unknown'
+                fc.name = UNKNOWN
                 fc.push(e)
               end
               fc.finish
@@ -72,6 +84,10 @@ module Fastlane
           block.call(infos)
         else
           # puts "[2] type: #{type} -- #{infos.count}"
+
+          #
+          # Plugins/、Frameworks/、app mach-o , 三者之外的其他类型的文件
+
           fc = FileCategory.new
           fc.name = type
           fc.merge(infos)

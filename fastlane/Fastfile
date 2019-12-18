@@ -1,6 +1,11 @@
 lane :hello do
   UI.success "✅ hello"
-  puts analyze_ios_ipa(
-    ipa_path: '/Users/xiongzenghui/Downloads/app.ipa'
+  analyze_ios_ipa(
+    ipa_path: '/Users/xiongzenghui/Downloads/app.ipa',
+    # group: false
   )
+
+  puts Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultHash]
+  puts '-' * 30
+  puts Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultJSON]
 end
