@@ -17,6 +17,3 @@ module Fastlane
     end
   end
 end
-
-# Fastlane::AnalyzeIosIpa::Config.instance.app = 'xxxx'
-# puts Config.app

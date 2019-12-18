@@ -4,6 +4,9 @@ module Fastlane
   module Helper
     require_relative 'info_plist'
 
+    #
+    # 文件
+    #
     class FileInfo
       FileInfoUnknownFile = :FileInfoUnknownFile
       FileInfoUnknownDir  = :FileInfoUnknownDir
@@ -13,11 +16,11 @@ module Fastlane
 
       def to_hash
         {
-          name: @name,
-          size: @size,
+          name:        @name,
+          size:        @size,
           formar_size: @formar_size,
-          path: @path,
-          type: @type
+          path:        @path,
+          type:        @type
         }
       end
 

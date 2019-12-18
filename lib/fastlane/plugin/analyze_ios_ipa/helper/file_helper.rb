@@ -44,6 +44,10 @@ module Fastlane
         "#{num} " + suffix[i]
       end
 
+      def self.glob_files(expr, dir)
+        Dir.glob(File.expand_path(expr, dir))
+      end
+
       def self.mv_file(src, dest)
         FileUtils.mv(src, dest)
       end

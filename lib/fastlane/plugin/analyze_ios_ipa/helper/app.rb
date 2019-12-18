@@ -13,16 +13,16 @@ module Fastlane
 
       def to_hash
         {
-          size: @size,
+          size:        @size,
           formar_size: @formar_size,
           info: {
-            executable: @info.executable,
+            executable:          @info.executable,
             device_capabilities: @info.device_capabilities,
-            # app_type: @info.app_type, #=> 只有自己项目使用
-            identifier: @info.identifier,
-            display_name: @info.display_name,
-            version: @info.version,
-            short_version: @info.short_version
+            app_type:            @info.app_type, #=> 只有自己项目使用
+            identifier:          @info.identifier,
+            display_name:        @info.display_name,
+            version:             @info.version,
+            short_version:       @info.short_version
           },
           categories: @categories.map(&:to_hash)
         }
@@ -50,77 +50,49 @@ module Fastlane
       def parse_files
         return @categories if @categories
 
-        @files = Dir.glob(File.expand_path('*', @app_path))
-        # puts @files
+        @files = FileHelper.glob_files('*', @app_path)
+        # pp @files
 
         @file_infos = files.map {|f|
           FileInfo.new(f)
         }
         # pp @file_infos
 
-        @goruped_file_infos = @file_infos.group_by { |e|
+        goruped_file_infos = @file_infos.group_by { |e|
           e.type
         }
-        # pp @goruped_file_infos
+        # pp goruped_file_infos
 
         categories = []
-        unknown_fc = FileCategory.new
-        unknown_fc.name = 'Unknown'
-        @goruped_file_infos.each { |k, v|
-          if :FileInfoUnknownDir == k
-            v.each { |e|
-              # pp e
-              if e.name == 'PlugIns'
-                # PlugIns/
-                ffc = FileCategory.new
-                ffc.name = 'PlugIns'
-                ffc.merge(Dir.glob(File.expand_path('*', e.path)).map { |f|
-                  FileInfo.new(f)
-                })
-                ffc.finish
-                categories << ffc
-              elsif e.name == 'Frameworks'
-                # Frameworks/
-                ffc = FileCategory.new
-                ffc.name = 'Frameworks'
-                ffc.merge(Dir.glob(File.expand_path('*', e.path)).map { |f|
-                  FileInfo.new(f)
-                })
-                ffc.finish
-                categories << ffc
-              else
-                unknown_fc.push(e)
-              end
-            }
-          elsif :FileInfoUnknownFile == k
-            v.map { |e|
-              if e.name == @info.executable
-                ffc = FileCategory.new
-                ffc.name = 'executable'
-                ffc.push(FileInfo.new(e.path))
-                ffc.finish
-                categories << ffc
-              else
-                unknown_fc.push(e)
-              end
-            }
-          else
-            ffc = FileCategory.new
-            ffc.name = k
-            ffc.merge(v)
-            ffc.finish
-            categories << ffc
-          end
-        }
-        unknown_fc.finish
-        categories << unknown_fc
-
-        categories.sort! { |left, right|
-          right.size <=> left.size
-        }
-
-        @categories = categories
+        categories.concat(goruped_file_infos.map { |k ,v|
+          FileCategory.categories(k, v, executable: @info.executable)
+        }.compact.flatten)
+        # pp categories.count
         # pp categories
+
+        # 去除 name == 'Unknown' 重复的 FileCategory
+        categories_rejected = categories.reject { |c|
+          c.name == 'Unknown'
+        }
+        # pp categories_reject.count
+
+        categories_rejecting = categories.select { |c|
+          c.name == 'Unknown'
+        }
+        # pp categories_rejecting
+
+        unknown_files_infos = []
+        categories_rejecting.each_with_object(unknown_files_infos) { |e, o|
+          unknown_files_infos.concat(e.file_infos).compact.flatten
+        }
+        unknown_files_infos.uniq! { |e| e.name }
+        unknown_category = FileCategory.categories('UnknownFiles', unknown_files_infos)
+        # pp unknown_category
+
+        categories_rejected.push(unknown_category)
+        # pp categories_rejected.count
+        # pp categories_rejected
+        @categories = categories_rejected
       end
 
       def generate_json

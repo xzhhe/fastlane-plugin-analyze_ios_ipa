@@ -18,7 +18,21 @@ module Fastlane
 
       def to_hash
         {
+          size:        @size,
+          formar_size: @formar_size
         }
+      end
+
+      def generate_json
+        return @result_json if @result_json
+        @result_json = JSON.generate(generate_hash)
+        @result_json
+      end
+
+      def generate_hash
+        return @result_hash if @result_hash
+        @result_hash = to_hash
+        @result_hash
       end
     end
   end

@@ -13,8 +13,8 @@ module Fastlane
 
         valid_params(ipa_path, app_path)
         analyze_ipa if ipa_path
-        # analyze_app if app_path
-        generate_result
+        analyze_app if app_path
+        generate_json
       end
 
       def self.valid_params(ipa_path, app_path)
@@ -30,8 +30,6 @@ module Fastlane
 
         Fastlane::Helper::Config.instance.ipa_path = ipa_path
         Fastlane::Helper::Config.instance.app_path = app_path
-        # UI.important("[valid_params] ipa_path: #{Fastlane::Helper::Config.ipa_path}")
-        # UI.important("[valid_params] app_path: #{Fastlane::Helper::Config.app_path}")
       end
 
       def self.analyze_ipa
@@ -53,7 +51,7 @@ module Fastlane
 
         # find xx.app
         app_path = nil
-        app_paths = Dir.glob(File.expand_path('*.app', payload))
+        app_paths = Fastlane::Helper::FileHelper.glob_files('*.app', payload)
         if app_paths.empty?
           UI.user_error!("❌ app_name not give") unless app_name
 
@@ -79,17 +77,18 @@ module Fastlane
 
         # 解析 xx.app
         app = Fastlane::Helper::App.new(app_path)
-        puts app.generate_json
-
-        # save app
         Fastlane::Helper::Config.instance.app = app
       end
 
-      def self.generate_result
-        # UI.important("🚗" * 50)
-        # pp Fastlane::Helper::Config.instance.ipa
-        # UI.important("🚙" * 50)
-        # pp Fastlane::Helper::Config.instance.app
+      def self.generate_json
+        JSON.generate(generate_hash)
+      end
+
+      def self.generate_hash
+        {
+          ipa: Fastlane::Helper::Config.instance.ipa.generate_hash,
+          app: Fastlane::Helper::Config.instance.app.generate_hash
+        }
       end
 
       def self.description
