@@ -67,20 +67,20 @@ module Fastlane
       end
 
       def self.unzip_ipa(ipa, output)
-        # return nil unless ipa
-        # return nil if ipa.empty?
-        # return nil unless File.exist?(ipa)
+        return nil unless ipa
+        return nil if ipa.empty?
+        return nil unless File.exist?(ipa)
 
-        # ## create output dir if need ?
-        # FileUtils.rm_rf(output)
-        # FileUtils.mkdir_p(output)
+        ## create output dir if need ?
+        FileUtils.rm_rf(output)
+        FileUtils.mkdir_p(output)
 
-        # ## xx.ipa => xx.zip
-        # cp_dest = File.expand_path('ipa.zip', output)
-        # cp_file(ipa, cp_dest)
+        ## xx.ipa => xx.zip
+        cp_dest = File.expand_path('app.zip', output)
+        cp_file(ipa, cp_dest)
 
-        # ## xx.zip => Payload/
-        # unzip_file(cp_dest, output)
+        ## xx.zip => Payload/
+        unzip_file(cp_dest, output)
 
         File.expand_path('Payload', output)
       end

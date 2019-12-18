@@ -12,15 +12,34 @@ fastlane add_plugin analyze_ios_ipa
 
 ## About analyze_ios_ipa
 
-xx
+如上是 export method 等于 app-store 时候, 打出的 xx.ipa 解压之后的目录结构:
 
-**Note to author:** Add a more detailed description about this plugin here. If your plugin contains multiple actions, make sure to mention them here.
+```
+├── Payload
+│   └── osee2unifiedRelease.app
+├── SwiftSupport
+└── Symbols
+```
+
+这个 plugin 主要是解析 **Payload/xx.app** 文件结构。
+
 
 ## Example
 
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin. Try it by cloning the repo, running `fastlane install_plugins` and `bundle exec fastlane test`.
 
-**Note to author:** Please set up a sample project to make it easy for users to explore what your plugin does. Provide everything that is necessary to try out the plugin in this project (including a sample Xcode/Android project if necessary)
+```ruby
+lane :hello do
+  analyze_ios_ipa(
+    ipa_path: '/Users/xiongzenghui/Downloads/app.ipa',
+    # group: false
+  )
+
+  puts Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultHash]
+  puts '-' * 30
+  puts Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultJSON]
+end
+```
 
 ## Run tests for this plugin
 
