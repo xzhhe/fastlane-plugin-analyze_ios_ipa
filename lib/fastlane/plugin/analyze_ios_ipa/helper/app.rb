@@ -8,7 +8,7 @@ module Fastlane
     require_relative 'file_category'
 
     class App
-      ATTRS = [:group, :size, :formar_size, :info, :executable]
+      ATTRS = [:group, :size, :format_size, :info, :executable]
       attr_accessor(*ATTRS)
       alias group? group
 
@@ -18,7 +18,7 @@ module Fastlane
       def to_hash
         h = {
           size:        @size,
-          formar_size: @formar_size,
+          format_size: @format_size,
           info: {
             executable:          @info.executable,
             device_capabilities: @info.device_capabilities,
@@ -49,7 +49,7 @@ module Fastlane
 
         # size
         @size        = FileHelper.file_size(app_path)
-        @formar_size = FileHelper.format_size(@size)
+        @format_size = FileHelper.format_size(@size)
 
         # info.plist
         info_plist_path = File.expand_path(INFO_PLIST, app_path)

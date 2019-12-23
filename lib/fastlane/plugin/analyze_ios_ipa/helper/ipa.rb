@@ -3,7 +3,7 @@ module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
   module Helper
     class Ipa
-      ATTRS = [:size, :formar_size]
+      ATTRS = [:size, :format_size]
       attr_accessor(*ATTRS)
 
       def initialize(ipa_path)
@@ -13,13 +13,13 @@ module Fastlane
 
         # size
         @size        = FileHelper.file_size(ipa_path)
-        @formar_size = FileHelper.format_size(@size)
+        @format_size = FileHelper.format_size(@size)
       end
 
       def to_hash
         {
           size:        @size,
-          formar_size: @formar_size
+          format_size: @format_size
         }
       end
 

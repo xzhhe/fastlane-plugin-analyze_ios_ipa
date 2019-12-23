@@ -15,16 +15,28 @@ module Fastlane
     class AnalyzeIosIpaAction < Action
       def self.run(params)
         ipa_path = params[:ipa_path]
-        app_name = params[:app_name]
         app_path = params[:app_path]
+        app_name = params[:app_name]
         group    = params[:group] || true
-
         valid_params(ipa_path, app_path)
-        analyze_ipa(group) if ipa_path
-        analyze_app(group) if app_path
+
+        UI.important("❗️[analyze_ios_ipa_action:run] ipa: #{ipa_path}")
+        UI.important("❗️[analyze_ios_ipa_action:run] app: #{app_path}")
+        UI.important("❗️[analyze_ios_ipa_action:run] app.name: #{app_name}")
+        UI.important("❗️[analyze_ios_ipa_action:run] group: #{group}")
+
+        ret = if ipa_path
+          analyze_ipa(group)
+        elsif app_path
+          analyze_app(group)
+        else
+          false
+        end
+        return false unless ret
 
         Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultHash] = generate_hash
         Actions.lane_context[Actions::SharedValues::AnalyzeIosIpaActionResultJSON] = generate_json
+        true
       end
 
       def self.valid_params(ipa_path, app_path)
@@ -44,7 +56,7 @@ module Fastlane
 
       def self.analyze_ipa(group)
         ipa_path = Fastlane::Helper::Config.instance.ipa_path
-        UI.important "❗️[analyze_ipa] ipa_path: #{ipa_path}"
+        UI.important "❗️[analyze_ios_ipa_action:analyze_ipa] ipa_path: #{ipa_path}"
 
         return false unless ipa_path
         return false if ipa_path.empty?
@@ -75,11 +87,12 @@ module Fastlane
 
         # 解析 xx.app
         analyze_app(group)
+        true
       end
 
       def self.analyze_app(group)
         app_path   = Fastlane::Helper::Config.instance.app_path
-        UI.important "❗️[analyze_app] app_path: #{app_path}"
+        UI.important "❗️[analyze_ios_ipa_action:analyze_app] app_path: #{app_path}"
 
         return false unless app_path
         return false if app_path.empty?
@@ -88,6 +101,7 @@ module Fastlane
         # 解析 xx.app
         app = Fastlane::Helper::App.new(app_path, group: group)
         Fastlane::Helper::Config.instance.app = app
+        true
       end
 
       def self.generate_json
@@ -96,9 +110,9 @@ module Fastlane
 
       def self.generate_hash
         {
-          ipa: Fastlane::Helper::Config.instance.ipa.generate_hash,
-          app: Fastlane::Helper::Config.instance.app.generate_hash
-        }
+          ipa: (Fastlane::Helper::Config.instance.ipa.generate_hash if Fastlane::Helper::Config.instance.ipa),
+          app: (Fastlane::Helper::Config.instance.app.generate_hash if Fastlane::Helper::Config.instance.app)
+        }.compact
       end
 
       def self.description
@@ -135,7 +149,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :app_name,
-            description: 'app file path',
+            description: 'app executable file name',
             type: String,
             optional: true
           ),

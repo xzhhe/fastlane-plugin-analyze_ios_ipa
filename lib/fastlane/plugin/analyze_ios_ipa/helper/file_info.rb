@@ -12,13 +12,13 @@ module Fastlane
       FileInfoUnknownDir  = :FileInfoUnknownDir
       FileInfoUnknown     = :FileInfoUnknown
 
-      attr_accessor :name, :path, :size, :formar_size, :type
+      attr_accessor :name, :path, :size, :format_size, :type
 
       def to_hash
         {
           name:        @name,
           size:        @size,
-          formar_size: @formar_size,
+          format_size: @format_size,
           path:        @path,
           type:        @type
         }
@@ -28,7 +28,7 @@ module Fastlane
         @name = File.basename(file_path)
         @path = file_path
         @size = FileHelper.file_size(file_path)
-        @formar_size = FileHelper.format_size(@size)
+        @format_size = FileHelper.format_size(@size)
 
         names = @name.split('.')
         @type = if names.count > 1

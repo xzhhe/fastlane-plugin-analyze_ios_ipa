@@ -9,7 +9,7 @@ module Fastlane
     # 文件类型
     #
     class FileCategory
-      attr_accessor :name, :file_infos, :size, :formar_size
+      attr_accessor :name, :file_infos, :size, :format_size
 
       PLUGINS       = 'PlugIns'
       FRAMEWORKS    = 'Frameworks'
@@ -21,7 +21,7 @@ module Fastlane
         {
           name:        @name,
           size:        @size,
-          formar_size: @formar_size,
+          format_size: @format_size,
           files:       @file_infos.map(&:to_hash)
         }
       end
@@ -110,7 +110,7 @@ module Fastlane
 
       def finish
         @size = @file_infos.map(&:size).inject(0, :+)
-        @formar_size = FileHelper.format_size(@size)
+        @format_size = FileHelper.format_size(@size)
       end
     end
   end
