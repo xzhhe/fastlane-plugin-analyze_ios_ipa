@@ -29,8 +29,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rspec')
   spec.add_development_dependency('rspec_junit_formatter')
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rubocop', '0.49.1')
+  spec.add_development_dependency('rubocop')
   spec.add_development_dependency('rubocop-require_tools')
   spec.add_development_dependency('simplecov')
-  spec.add_development_dependency('fastlane', '>= 2.128.1')
+  spec.add_development_dependency('fastlane')
 end
